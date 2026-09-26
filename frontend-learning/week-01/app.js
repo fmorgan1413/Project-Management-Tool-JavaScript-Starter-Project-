@@ -11,131 +11,128 @@ const rl = readline.createInterface({
 
 showMenu();
 
-
 async function showMenu() {
-    while (true) {
-    console.log('=== Project Manager ===');
-    console.log('1. View Projects');
-    console.log('2. View High Priority Projects');
-    console.log('3. Find Project');
-    console.log('4. View Project Report');
-    console.log('5. Exit');
-    console.log('6. Create Project');
-    console.log('7. Delete Project');
-    console.log('8. Update Project');
+    try{
+        while (true) {
+        console.log('=== Project Manager ===');
+        console.log('1. View Projects');
+        console.log('2. View High Priority Projects');
+        console.log('3. Find Project');
+        console.log('4. View Project Report');
+        console.log('5. Exit');
+        console.log('6. Create Project');
+        console.log('7. Delete Project');
+        console.log('8. Update Project');
 
-    const option = await askQuestion('Choose an option: ');
-    switch (option) {
-        case '1':
-            console.log('Viewing all projects...');
-            displayProjects(projects);
-            break;
-        case '2':
-            console.log('Viewing high priority projects...');
-            displayProjects(getProjectsByPriority(projects, 'High'));
-            break;
-        case '3':
-            const name = await askQuestion('Enter the project name: ');
-            const project = getProjectByName(projects, name);
+        const option = await askQuestion('Choose an option: ');
 
-            if (!project) {
-                console.log('Project not found.');
+        switch (option) {
+            case '1':
+                console.log('Viewing all projects...');
+                displayProjects(projects);
+                break;
+            case '2':
+                console.log('Viewing high priority projects...');
+                displayProjects(getProjectsByPriority(projects, 'High'));
+                break;
+            case '3':
+                const name = await askQuestion('Enter the project name: ');
+                const project = getProjectByName(projects, name);
+
+                if (!project) {
+                    console.log('Project not found.');
+                    break;
+                }
+
+                const isValid = isProjectValid(project);
+                        
+                if (isValid) {
+                    displayProjects([project]);
+                } else {
+                    console.log('Invalid project.');
+                }
+                break;
+            case '4':
+                const report = getProjectReport(projects);
+
+                console.log('=== Project Report ===');
+                console.log(`Total Projects: ${report.totalProjects}`);
+                console.log(`Valid Projects: ${report.validProjects}`);
+                console.log(`High Priority Projects: ${report.highPriorityProjects}`);
+                break;
+            case '5':
+                console.log('Exiting...');
+                rl.close();
+                return;
+            default:
+                console.log('Invalid option. Please try again.');
+                break;
+            case '6': {
+                const name = await askQuestion('Enter project name: ');
+                const priority = await askQuestion('Enter project priority (High, Medium, Low): ');
+                const totalTasks = await askQuestion('Enter total tasks: ');
+                const completedTasks = await askQuestion('Enter the # of any completed tasks: ');
+                
+                const newProject = {
+                    name: name,
+                    priority: priority,
+                    totalTasks: parseInt(totalTasks),
+                    completedTasks: parseInt(completedTasks)
+                };
+                                    
+                normalizeProject(newProject);
+                if (!isProjectValid(newProject)) {
+                    console.log('Invalid project details. Please try again.');
+                    break;
+                }
+
+                projects.push(newProject);
+                console.log('Project created successfully.');
+                console.log('Project Details:');
+                displayProjects([newProject]);
                 break;
             }
-
-            const isValid = isProjectValid(project);
-                    
-            if (isValid) {
-                displayProjects([project]);
-            } else {
-                console.log('Invalid project.');
+            case '7':{
+                const name = await askQuestion('Enter project name to delete: ');
+                const projectIndex = projects.findIndex((project) => project.name.toLowerCase().trim() === name.toLowerCase().trim());
+                if (projectIndex === -1) {
+                    console.log('Project not found.');
+                } else {
+                    projects.splice(projectIndex, 1);
+                    console.log('Project deleted successfully.');
+                }
+                break;
             }
-            break;
-        case '4':
-            const report = getProjectReport(projects);
-
-            console.log('=== Project Report ===');
-            console.log(`Total Projects: ${report.totalProjects}`);
-            console.log(`Valid Projects: ${report.validProjects}`);
-            console.log(`High Priority Projects: ${report.highPriorityProjects}`);
-            break;
-        case '5':
-            console.log('Exiting...');
-            rl.close();
-            return;
-        default:
-            console.log('Invalid option. Please try again.');
-            break;
-        case '6': {
-            const name = await askQuestion('Enter project name: ');
-            const priority = await askQuestion('Enter project priority (High, Medium, Low): ');
-            const totalTasks = await askQuestion('Enter total tasks: ');
-            const completedTasks = await askQuestion('Enter the # of any completed tasks: ');
-               
-            const newProject = {
-                name: name,
-                priority: priority,
-                totalTasks: parseInt(totalTasks),
-                completedTasks: parseInt(completedTasks)
-            };
-                                
-            normalizeProject(newProject);
-            if (!isProjectValid(newProject)) {
-                console.log('Invalid project details. Please try again.');
-                await showMenu();
-                return;
+            case '8':{
+                const name = await askQuestion('Enter project name to update: ');
+                const projectIndex = projects.findIndex((project) => project.name.toLowerCase().trim() === name.toLowerCase().trim());
+                if (projectIndex === -1) {
+                    console.log('Project not found.');
+                    break;
+                } 
+                const priority = await askQuestion('Enter new project priority (High, Medium, Low): ');
+                const totalTasks = await askQuestion('Enter new total tasks: ');
+                const completedTasks = await askQuestion('Enter the # of any completed tasks: ');
+                const updatedProject = { ...projects[projectIndex] };
+                updatedProject.priority = priority;
+                updatedProject.totalTasks = parseInt(totalTasks);
+                updatedProject.completedTasks = parseInt(completedTasks);
+                normalizeProject(updatedProject);
+                if (!isProjectValid(updatedProject)) {
+                    console.log('Invalid project details. Please try again.');
+                    break;
+                }
+                projects[projectIndex] = updatedProject;
+                console.log('Project updated successfully.');
+                console.log('Updated Project Details:');
+                displayProjects([updatedProject]);
+                break;
             }
-
-            projects.push(newProject);
-            console.log('Project created successfully.');
-            console.log('Project Details:');
-            displayProjects([newProject]);
-            await showMenu();
-            break;
         }
-        case '7':{
-            const name = await askQuestion('Enter project name to delete: ');
-            const projectIndex = projects.findIndex((project) => project.name.toLowerCase().trim() === name.toLowerCase().trim());
-            if (projectIndex === -1) {
-                console.log('Project not found.');
-            } else {
-                projects.splice(projectIndex, 1);
-                console.log('Project deleted successfully.');
-            }
-            break;
         }
-            case '8':
-                rl.question('Enter project name to update: ', (name) => {
-                    const projectIndex = projects.findIndex((project) => project.name.toLowerCase().trim() === name.toLowerCase().trim());
-                    if (projectIndex === -1) {
-                        console.log('Project not found.');
-                        showMenu();
-                        return;
-                    } 
-                    rl.question('Enter new project priority (High, Medium, Low): ', (priority) => {
-                        rl.question('Enter new total tasks: ', (totalTasks) => {
-                            rl.question('Enter the # of any completed tasks: ', (completedTasks) => {
-                                const updatedProject = { ...projects[projectIndex] };
-                                updatedProject.priority = priority;
-                                updatedProject.totalTasks = parseInt(totalTasks);
-                                updatedProject.completedTasks = parseInt(completedTasks);
-                                normalizeProject(updatedProject);
-                                if (!isProjectValid(updatedProject)) {
-                                    console.log('Invalid project details. Please try again.');
-                                    showMenu();
-                                    return;
-                                }
-                                projects[projectIndex] = updatedProject;
-                                console.log('Project updated successfully.');
-                                console.log('Updated Project Details:');
-                                displayProjects([updatedProject]);
-                                showMenu();
-                            });
-                        });
-                    });
-                    
-                });
-        }
+    } catch (error) {
+        console.log('Something went wrong.');
+        console.log(error.message);
     }
 }
 
@@ -154,10 +151,14 @@ function displayProjects(projects) {
 } 
 
 function askQuestion(question) {
-    return new Promise((resolve) => {
-        rl.question(question, (answer) => {
-            resolve(answer);
-        });
+    return new Promise((resolve, reject) => {
+        try {
+            rl.question(question, (answer) => {
+                resolve(answer);
+            });
+        } catch (error) {
+            reject(error);
+        }
     });
 }
 
@@ -165,4 +166,18 @@ async function testInput(){
     const name = await askQuestion('Enter the project name: ');
     console.log(`You entered the project name: ${name}`);
     rl.close();
+}
+
+function testErrorHandling() {
+    try {
+        console.log('Before error');
+
+        const project = null;
+        console.log(project.name);
+        console.log('After error');
+    } catch (error) {
+        console.error(error.message);
+    } 
+
+    console.log('Program continues');
 }

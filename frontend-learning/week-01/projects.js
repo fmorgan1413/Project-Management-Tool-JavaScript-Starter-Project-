@@ -90,13 +90,29 @@ export function isProjectValid(project) {
     if (!project.name || typeof project.name !== 'string') {
         return false;
     }
+    if (isNaN(project.totalTasks) || isNaN(project.completedTasks)) {
+        return false;
+    }
     if (project.totalTasks < 0 || project.completedTasks < 0 || project.completedTasks > project.totalTasks) {
         return false;
     }
     if (!project.priority || typeof project.priority !== 'string') {
         return false;
     }
+    if (project.priority.toLowerCase().trim() !== 'high' && project.priority.toLowerCase().trim() !== 'medium' && project.priority.toLowerCase().trim() !== 'low') {
+        return false;
+    }
     return true;
+}
+
+export function normalizeProject(project) {
+    if (project.priority.toLowerCase().trim() === 'high') {
+        project.priority = 'High';
+    } else if (project.priority.toLowerCase().trim() === 'medium') {
+        project.priority = 'Medium';
+    } else if (project.priority.toLowerCase().trim() === 'low') {
+        project.priority = 'Low';
+    }
 }
 
 export function getValidProjectSummaries(projects) {

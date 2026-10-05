@@ -69,17 +69,8 @@ async function showMenu() {
                 break;
             case '6': {
                 const name = await askQuestion('Enter project name: ');
-                const priority = await askQuestion('Enter project priority (High, Medium, Low): ');
-                const totalTasks = await askQuestion('Enter total tasks: ');
-                const completedTasks = await askQuestion('Enter the # of any completed tasks: ');
+                const newProject = await askForProjectDetails(name);
                 
-                const newProject = {
-                    name: name,
-                    priority: priority,
-                    totalTasks: parseInt(totalTasks),
-                    completedTasks: parseInt(completedTasks)
-                };
-                                    
                 normalizeProject(newProject);
                 if (!isProjectValid(newProject)) {
                     console.log('Invalid project details. Please try again.');
@@ -109,14 +100,10 @@ async function showMenu() {
                 if (projectIndex === -1) {
                     console.log('Project not found.');
                     break;
-                } 
-                const priority = await askQuestion('Enter new project priority (High, Medium, Low): ');
-                const totalTasks = await askQuestion('Enter new total tasks: ');
-                const completedTasks = await askQuestion('Enter the # of any completed tasks: ');
-                const updatedProject = { ...projects[projectIndex] };
-                updatedProject.priority = priority;
-                updatedProject.totalTasks = parseInt(totalTasks);
-                updatedProject.completedTasks = parseInt(completedTasks);
+                }
+
+                const updatedProjectDetails = await askForProjectDetails(name);
+                const updatedProject = { ...projects[projectIndex], ...updatedProjectDetails };
                 normalizeProject(updatedProject);
                 if (!isProjectValid(updatedProject)) {
                     console.log('Invalid project details. Please try again.');
@@ -160,6 +147,21 @@ function askQuestion(question) {
             reject(error);
         }
     });
+}
+
+async function askForProjectDetails(name) {
+    const priority = await askQuestion('Enter the project priority (High, Medium, Low): ');
+    const totalTasks = await askQuestion('Enter the total number of tasks: ');
+    const completedTasks = await askQuestion('Enter the number of completed tasks: ');
+
+    const project = {
+        name,
+        priority,
+        totalTasks: parseInt(totalTasks),
+        completedTasks: parseInt(completedTasks)
+    };
+    
+    return project;
 }
 
 async function testInput(){

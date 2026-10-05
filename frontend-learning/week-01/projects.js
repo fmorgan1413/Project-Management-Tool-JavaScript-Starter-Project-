@@ -37,14 +37,14 @@ export const projects = [
     }
 ];
 
-function getCompletionPercentage(project) {
+export function getCompletionPercentage(project) {
     if (project.totalTasks === 0) {
         return 0;
     }
     return (project.completedTasks / project.totalTasks) * 100;
 }
 
-function getProjectStatus(project) {
+export function getProjectStatus(project) {
     const completionPercentage = getCompletionPercentage(project);
 
     if (completionPercentage === 100) {
@@ -67,7 +67,7 @@ export function getProjectsByPriority(projects, priority) {
 }
 
 
-function getProjectSummary(project) {
+export function getProjectSummary(project) {
     
     if (!isProjectValid(project)) {
         return null;
@@ -80,10 +80,6 @@ function getProjectSummary(project) {
         status: getProjectStatus(project),
         remainingTasks: getRemainingTasks(project)
     };
-}
-
-function getAllProjectSummaries(projects) {
-    return projects.map((project) => getProjectSummary(project));
 }
 
 export function isProjectValid(project) {

@@ -151,14 +151,24 @@ function askQuestion(question) {
 
 async function askForProjectDetails(name) {
     const priority = await askQuestion('Enter the project priority (High, Medium, Low): ');
-    const totalTasks = await askQuestion('Enter the total number of tasks: ');
-    const completedTasks = await askQuestion('Enter the number of completed tasks: ');
+
+    let totalTasks = Number(await askQuestion('Enter the total number of tasks: '));
+    while (!Number.isFinite(totalTasks) || totalTasks < 0) {
+        console.log('Invalid input. Please enter a valid number.');
+        totalTasks = Number(await askQuestion('Enter the total number of tasks: '));
+    }
+
+    let completedTasks = Number(await askQuestion('Enter the number of completed tasks: '));
+    while (!Number.isFinite(completedTasks) || completedTasks < 0 || completedTasks > totalTasks) {
+        console.log('Invalid input. Please enter a valid number of completed tasks.');
+        completedTasks = Number(await askQuestion('Enter the number of completed tasks: '));
+    }
 
     const project = {
         name,
         priority,
-        totalTasks: parseInt(totalTasks),
-        completedTasks: parseInt(completedTasks)
+        totalTasks,
+        completedTasks
     };
     
     return project;

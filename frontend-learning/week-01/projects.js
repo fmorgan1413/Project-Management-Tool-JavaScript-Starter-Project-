@@ -92,6 +92,9 @@ export function isProjectValid(project) {
     if (project.totalTasks < 0 || project.completedTasks < 0 || project.completedTasks > project.totalTasks) {
         return false;
     }
+    if (Number.isInteger(project.totalTasks) === false || Number.isInteger(project.completedTasks) === false) {
+        return false;
+    }
     if (!project.priority || typeof project.priority !== 'string') {
         return false;
     }

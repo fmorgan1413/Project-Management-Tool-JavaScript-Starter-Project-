@@ -173,6 +173,20 @@ describe('isProjectValid', () => {
         const result = isProjectValid(project);
         assert.strictEqual(result, false);
     });
+
+    test('isProjectValid returns false when the totalTasks is not an integer', () => {
+        const project = createTestProject({ totalTasks: 10.5 });
+
+        const result = isProjectValid(project);
+        assert.strictEqual(result, false);
+    });
+
+    test('isProjectValid returns false when the completedTasks is not an integer', () => {
+        const project = createTestProject({ completedTasks: 5.5 });
+
+        const result = isProjectValid(project);
+        assert.strictEqual(result, false);
+    });
 });
 
 describe('normalizeProject', () => {

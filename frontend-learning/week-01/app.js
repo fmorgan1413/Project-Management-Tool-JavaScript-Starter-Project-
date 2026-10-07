@@ -14,15 +14,7 @@ showMenu();
 async function showMenu() {
     try{
         while (true) {
-        console.log('=== Project Manager ===');
-        console.log('1. View Projects');
-        console.log('2. View High Priority Projects');
-        console.log('3. Find Project');
-        console.log('4. View Project Report');
-        console.log('5. Exit');
-        console.log('6. Create Project');
-        console.log('7. Delete Project');
-        console.log('8. Update Project');
+        displayMenu();
 
         const option = await askQuestion('Choose an option: ');
 
@@ -60,14 +52,7 @@ async function showMenu() {
                 console.log(`Valid Projects: ${report.validProjects}`);
                 console.log(`High Priority Projects: ${report.highPriorityProjects}`);
                 break;
-            case '5':
-                console.log('Exiting...');
-                rl.close();
-                return;
-            default:
-                console.log('Invalid option. Please try again.');
-                break;
-            case '6': {
+            case '5': {
                 const name = await askQuestion('Enter project name: ');
                 const newProject = await askForProjectDetails(name);
                 
@@ -83,7 +68,7 @@ async function showMenu() {
                 displayProjects([newProject]);
                 break;
             }
-            case '7':{
+            case '6':{
                 const name = await askQuestion('Enter project name to delete: ');
                 const projectIndex = projects.findIndex((project) => project.name.toLowerCase().trim() === name.toLowerCase().trim());
                 if (projectIndex === -1) {
@@ -94,7 +79,7 @@ async function showMenu() {
                 }
                 break;
             }
-            case '8':{
+            case '7':{
                 const name = await askQuestion('Enter project name to update: ');
                 const projectIndex = projects.findIndex((project) => project.name.toLowerCase().trim() === name.toLowerCase().trim());
                 if (projectIndex === -1) {
@@ -115,6 +100,13 @@ async function showMenu() {
                 displayProjects([updatedProject]);
                 break;
             }
+            case '8':
+                console.log('Exiting...');
+                rl.close();
+                return;
+            default:
+                console.log('Invalid option. Please try again.');
+                break;
         }
         }
     } catch (error) {
@@ -123,16 +115,28 @@ async function showMenu() {
     }
 }
 
+function displayMenu() {
+    console.log('=== Project Manager ===');
+    console.log('1. View Projects');
+    console.log('2. View High Priority Projects');
+    console.log('3. Find Project');
+    console.log('4. View Project Report');
+    console.log('5. Create Project');
+    console.log('6. Delete Project');
+    console.log('7. Update Project');
+    console.log('8. Exit');
+}
+
 function displayProjects(projects) {
     console.log('=== Viewing Projects ===');
 
     const summaries = getValidProjectSummaries(projects);
     summaries.forEach((summary) => {
         console.log(`Project Name: ${summary.name}
-        Priority: ${summary.priority}
-        Completion: ${summary.completionPercentage.toFixed(2)}%
-        Status: ${summary.status}
-        Remaining Tasks: ${summary.remainingTasks}`);
+    Priority: ${summary.priority}
+    Completion: ${summary.completionPercentage.toFixed(2)}%
+    Status: ${summary.status}
+    Remaining Tasks: ${summary.remainingTasks}`);
         }
     );
 } 
@@ -172,24 +176,4 @@ async function askForProjectDetails(name) {
     };
     
     return project;
-}
-
-async function testInput(){
-    const name = await askQuestion('Enter the project name: ');
-    console.log(`You entered the project name: ${name}`);
-    rl.close();
-}
-
-function testErrorHandling() {
-    try {
-        console.log('Before error');
-
-        const project = null;
-        console.log(project.name);
-        console.log('After error');
-    } catch (error) {
-        console.error(error.message);
-    } 
-
-    console.log('Program continues');
 }
